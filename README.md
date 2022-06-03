@@ -1,6 +1,5 @@
 #### 确认是否是neox引擎
-[解包](https://github.com/ZhangFengze/AndroidGameHackTutorial)
-看是否有大量NeoX相关
+解包看是否有大量NeoX相关
 
 #### 确认CPython版本
 NeoX魔改了CPython，确认NeoX的CPython版本，以便参考源码。  
