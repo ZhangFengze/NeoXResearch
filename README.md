@@ -3,10 +3,14 @@
 看是否有大量NeoX相关
 
 #### 确认CPython版本
-NeoX魔改了CPython，确认NeoX的CPython版本，以便参考源码。
-IDA Pro打开核心so库，开Strings窗口，搜python，大概率能看到带python源码的调试输出字符串，例如  
-![image](https://user-images.githubusercontent.com/21135715/171878141-a7e6755e-ef7f-4ff4-8bc5-cc5c60e129fa.png)
-即可确认主次版本号
+NeoX魔改了CPython，确认NeoX的CPython版本，以便参考源码。  
+CPython有很多调试字符串，里面记录了源文件路径，我们可以借此得到python主次版本号。  
+IDA Pro打开核心so库，开Strings窗口，搜python    
+![image](https://user-images.githubusercontent.com/21135715/171880588-df7fbaec-d307-443d-925f-c8458eac20d5.png)  
+
+CPython定义了PY_VERSION字符串，格式是MAJOR.MINOR.PATCH，我们再次搜索2.7.  
+![image](https://user-images.githubusercontent.com/21135715/171880752-0c2db9c7-5b09-439a-b60b-d40bc072a415.png)  
+可得到完整版本号为2.7.3
 
 
 参考  
