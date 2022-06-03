@@ -3,6 +3,7 @@
 
 #### 确认CPython版本
 NeoX魔改了CPython，确认NeoX的CPython版本，以便参考源码。  
+
 CPython有很多调试字符串，里面记录了源文件路径，我们可以借此得到python主次版本号。  
 IDA Pro打开核心so库，开Strings窗口，搜python    
 ![image](https://user-images.githubusercontent.com/21135715/171880588-df7fbaec-d307-443d-925f-c8458eac20d5.png)  
