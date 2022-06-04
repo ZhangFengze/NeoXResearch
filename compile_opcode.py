@@ -10,4 +10,4 @@ def CompileAndDump(script, outputPath):
 opcode = open('pyopcode.py').read()
 CompileAndDump(opcode, "pyopcode.pyc")
 opcode_division = opcode[2:]
-CompileAndDump(opcode, "pyopcode_division.pyc")
+CompileAndDump(opcode_division, "pyopcode_division.pyc")
