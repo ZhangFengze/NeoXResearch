@@ -39,13 +39,15 @@ int main(int argc, char *argv[])
     Py_Initialize = base + 0x0135ABA0 + 1;
     Py_Initialize();
 
+    void (*PySys_SetArgv)(int, char **);
+    PySys_SetArgv = base + 0x0136005C + 1;
+    PySys_SetArgv(argc - 1, argv + 1);
+
     void (*PyRun_SimpleString)(char *);
-    // PyRun_SimpleString = dlsym(lib, "PyRun_SimpleString");
     PyRun_SimpleString = base + 0x0135C796 + 1;
     PyRun_SimpleString(buf);
 
     void (*Py_Finalize)();
-    // Py_Finalize = dlsym(lib, "Py_Finalize");
     Py_Finalize = base + 0x0135ABA8 + 1;
     Py_Finalize();
 
