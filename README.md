@@ -29,6 +29,7 @@ CPython定义了PY_VERSION字符串，格式是MAJOR.MINOR.PATCH，我们再次�
 [neox-tools](https://github.com/xforce/neox-tools)  
 [NeteaseUnpackTools](https://github.com/yuanbi/NeteaseUnpackTools)  
 [unnpk](https://github.com/YJBeetle/unnpk)
+[pymarshal.py](https://gist.github.com/fate0/3e1d23bce9d4d2cfa93848dd92aba3d4)
 
 基础流程没有变  
 不过pyc混淆不止重映射opcode了，还加入了新的opcode  
