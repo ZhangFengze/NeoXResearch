@@ -23,7 +23,10 @@ CPython定义了PY_VERSION字符串，格式是MAJOR.MINOR.PATCH，我们再次�
 修复opcode时按规则将新opcode换成旧opcode的组合即可。  
 这里可能有更好解法：  
 1.令NeoX Python编译py得到带新opcode的pyc，对比原版。但是NeoX Python常规编译pyc是不带新opcode的。怀疑是有一个特殊的函数，或者独立的工具来编译带新opcode的pyc。NeoX Python只能够接收处理这些opcode，并不能生成。没有细找是否是特殊函数。  
-2.令NeoX Python解读自己的pyc得到内存对象，再用原版Python函数输出原版pyc。仔细想了下，解读pyc得到的内存对象还是魔改过的一堆opcode，无法直接用原版Python输出。没找到是否有其他中间对象可供转换。（发现AST似乎可以当中间对象，但没有内置的pyc转AST的）  
+2.令NeoX Python解读自己的pyc得到内存对象，再用原版Python函数输出原版pyc。仔细想了下，解读pyc得到的内存对象还是魔改过的一堆opcode，无法直接用原版Python输出。没找到是否有其他中间对象可供转换。（发现AST似乎可以当中间对象，但没有内置的pyc转AST的） 
+
+#### 获得内置模块
+NeoX从C++注册了一些模块。我们用NeoX Python将模块dump得到pyc，按之前的方式解码出等价的python源码
 
 参考  
 [neox-tools](https://github.com/xforce/neox-tools)  
