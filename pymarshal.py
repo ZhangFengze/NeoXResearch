@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import types
 import cStringIO
 
@@ -233,10 +234,102 @@ class _Marshaller:
         opcode = bytearray(x)
         c = 0
         while c < len(opcode):
+            n = opcode[c]
+            if n == 160:
+                print("!!!! 160")
+            
+            if n== 110:
+                print("!!!! 110")
+
+            # 169相当于LOAD_CONST接LOAD_CONST
+            if n == 169:
+                opcode[c]=153
+                opcode[c+3]=153
+
+            # 186相当于LOAD_CONST接MAKE_FUNCTION
+            if n==186:
+                opcode[c]=153
+                opcode[c+3]=136
+
+            # 202相当于LOAD_ATTR接LOAD_ATTR
+            if n==202:
+                opcode[c]=96
+                opcode[c+3]=96
+            
+            # 143相当于CALL_FUNCTION接POP_TOP
+            # POP_TOP无参，插入到后面
+            if n==143:
+                opcode[c]=131
+                opcode=opcode[:c+3]+ bytearray([38]) + opcode[c+3:]
+
+            # 231相当于LOAD_CONST接RETURN_VALUE
+            # RETURN_VALUE无参，插入到后面
+            if n==231:
+                opcode[c]=153
+                opcode=opcode[:c+3]+ bytearray([83]) + opcode[c+3:]
+
+            # 173相当于LOAD_FAST 0 接LOAD_CONST
+            # LOAD_FAST参数固定0
+            if n==173:
+                opcode=opcode[:c]+bytearray([97,0,0,153])+opcode[c+1:]
+
+            # 203相当于LOAD_FAST接LOAD_FAST
+            if n==203:
+                opcode[c]=97
+                opcode[c+3]=97
+
+            # 124相当于LOAD_FAST接LOAD_CONST
+            if n==124:
+                opcode[c]=97
+                opcode[c+3]=153
+
+            # 227相当于LOAD_FAST接LOAD_ATTR
+            if n==227:
+                opcode[c]=97
+                opcode[c+3]=96
+
+            # 205相当于LOAD_FAST接CALL_FUNCTION
+            if n==205:
+                opcode[c]=97
+                opcode[c+3]=131
+
+            # 208相当于LOAD_GLOBAL接LOAD_FAST
+            if n==208:
+                opcode[c]=155
+                opcode[c+3]=97
+
+            # 247相当于CALL_FUNCTION接STORE_FAST
+            if n==247:
+                opcode[c]=131
+                opcode[c+3]=104
+
+            # 168相当于LOAD_ATTR接LOAD_FAST
+            if n==168:
+                opcode[c]=96
+                opcode[c+3]=97
+
+            # 194相当于MAKE_FUNCTION接STORE_NAME
+            if n==194:
+                opcode[c]=136
+                opcode[c+3]=145
+
+            # 69相当于LOAD_LOCALS接RETURN_VALUE
+            # 都不需要参数，插入
+            if n==69:
+                opcode=opcode[:c]+bytearray([50,83])+opcode[c+1:]
+
+            # 210相当于COMPARE_OP接POP_JUMP_IF_FALSE
+            if n==210:
+                opcode[c]=114
+                opcode[c+3]=148
+
+
             try:
                 n = self._opmap[opcode[c]]
             except:
-                print("unmaping %s" % opcode[c])
+                print("unknown %s" % opcode[c])
+                # print("unknown %s, set 255" % opcode[c])
+                # n=255
 
             opcode[c] = n
 
