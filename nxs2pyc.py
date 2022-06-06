@@ -20,20 +20,19 @@ def _reverse_string(s):
     return ''.join(l)
 
 
-def main():
+def nxs2pyc(data):
+    rotor = init_rotor()
+    data = rotor.decrypt(data)
+    data = zlib.decompress(data)
+    data = _reverse_string(data)
+    return data
+
+
+if __name__ == "__main__":
     infile = sys.argv[1]
     outfile = sys.argv[2]
 
-    data = open(infile,"rb").read()
-    rotor = init_rotor()
-    data = rotor.decrypt(data)
-    with open("tmp","wb") as out:
-        out.write(data)
-    data = zlib.decompress(data)
-    data = _reverse_string(data)
-
+    data = open(infile, "rb").read()
+    data = nxs2pyc(data)
     with open(outfile, "wb") as out:
         out.write(data)
-
-
-main()
