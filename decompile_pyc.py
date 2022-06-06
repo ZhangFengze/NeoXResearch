@@ -1,17 +1,20 @@
 import sys
 import uncompyle6
-import tempfile
-from io import StringIO
+import io
+from backports import tempfile
 
 
 def decompile_pyc(data):
     with tempfile.TemporaryDirectory() as dir:
-        tempPath = dir+"/temp.pyc"
-        with open(tempPath, "wb") as f:
-            f.write(data)
-        out = StringIO()
-        uncompyle6.decompile_file(tempPath, out)
-        return out.getvalue()
+        inpath = dir+"/in.pyc"
+        with open(inpath, "wb") as infile:
+            infile.write(data)
+
+        outpath = dir+"out.pyc"
+        with open(outpath, "w+b") as outfile:
+            uncompyle6.decompile_file(inpath, outfile)
+            outfile.seek(0)
+            return outfile.read()
 
 
 if __name__ == "__main__":
