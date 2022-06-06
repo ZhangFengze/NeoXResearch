@@ -323,6 +323,16 @@ class _Marshaller:
                 opcode[c]=114
                 opcode[c+3]=148
 
+            # 220相当于 LOAD_CONST LOAD_CONST STORE_MAP
+            if n==220:
+                opcode[c]=153
+                opcode[c+3]=153
+                opcode=opcode[:c+6]+bytearray([8])+opcode[c+6:]
+
+            # 207相当于 STORE_NAME LOAD_CONST
+            if n==207:
+                opcode[c]=145
+                opcode[c+3]=153
 
             try:
                 n = self._opmap[opcode[c]]
