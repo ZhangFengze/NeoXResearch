@@ -353,6 +353,33 @@ class _Marshaller:
                 opcode=opcode[:c+6]+bytearray([38])+opcode[c+6:]
                 old_addr=old_addr[:c+6]+[old_addr[c+5]]+old_addr[c+6:]
 
+            # 179相当于LOAD_ATTR CALL_FUNCTION
+            if n==179:
+                opcode[c]=96
+                opcode[c+3]=131
+
+            # 192相当于LOAD_ATTR LOAD_GLOBAL
+            if n==192:
+                opcode[c]=96
+                opcode[c+3]=155
+
+            # 150相当于LOAD_ATTR CALL_FUNCTION POP_TOP
+            if n==150:
+                opcode[c]=96
+                opcode[c+3]=131
+                opcode=opcode[:c+6]+bytearray([38])+opcode[c+6:]
+                old_addr=old_addr[:c+6]+[old_addr[c+5]]+old_addr[c+6:]
+
+            # 98相当于LOAD_CONST LOAD_FAST
+            if n==98:
+                opcode[c]=153
+                opcode[c+3]=97
+            
+            # 244相当于LOAD_GLOBAL CALL_FUNCTION
+            if n==244:
+                opcode[c]=155
+                opcode[c+3]=131
+
             try:
                 n = self._opmap[opcode[c]]
             except:
