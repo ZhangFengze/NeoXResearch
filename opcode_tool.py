@@ -22,11 +22,12 @@ def help_as_neox(neox_op):
         print("unknown neox opcode")
 
 
-op = sys.argv[1]
-try:
-    op = int(op)
-    help_as_standard(op)
-    help_as_neox(op)
-except ValueError:
-    op = opcode.opmap[op]
-    help_as_standard(op)
+if __name__ == "__main__":
+    op = sys.argv[1]
+    try:
+        op = int(op)
+        help_as_standard(op)
+        help_as_neox(op)
+    except ValueError:
+        op = opcode.opmap[op]
+        help_as_standard(op)
