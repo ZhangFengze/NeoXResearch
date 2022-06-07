@@ -334,6 +334,17 @@ class _Marshaller:
                 opcode[c]=145
                 opcode[c+3]=153
 
+            # 214相当于 CALL_FUNCTION CALL_FUNCTION
+            if n==214:
+                opcode[c]=131
+                opcode[c+3]=131
+
+            # 201相当于LOAD_GLOBAL CALL_FUNCTION POP_TOP
+            if n==201:
+                opcode[c]=155
+                opcode[c+3]=131
+                opcode=opcode[:c+6]+bytearray([38])+opcode[c+6:]
+
             try:
                 n = self._opmap[opcode[c]]
             except:
