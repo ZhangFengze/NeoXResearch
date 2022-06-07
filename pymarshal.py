@@ -232,6 +232,8 @@ class _Marshaller:
             return x
             
         opcode = bytearray(x)
+        old_addr = range(len(x)) # 记录对应的旧地址，用来修复jump
+
         c = 0
         while c < len(opcode):
             n = opcode[c]
@@ -261,17 +263,20 @@ class _Marshaller:
             if n==143:
                 opcode[c]=131
                 opcode=opcode[:c+3]+ bytearray([38]) + opcode[c+3:]
+                old_addr=old_addr[:c+3]+[old_addr[c+2]]+old_addr[c+3:]
 
             # 231相当于LOAD_CONST接RETURN_VALUE
             # RETURN_VALUE无参，插入到后面
             if n==231:
                 opcode[c]=153
                 opcode=opcode[:c+3]+ bytearray([83]) + opcode[c+3:]
+                old_addr=old_addr[:c+3]+[old_addr[c+2]]+old_addr[c+3:]
 
             # 173相当于LOAD_FAST 0 接LOAD_CONST
             # LOAD_FAST参数固定0
             if n==173:
                 opcode=opcode[:c]+bytearray([97,0,0,153])+opcode[c+1:]
+                old_addr=old_addr[:c]+[old_addr[c]]*4+old_addr[c+1:]
 
             # 203相当于LOAD_FAST接LOAD_FAST
             if n==203:
@@ -317,6 +322,7 @@ class _Marshaller:
             # 都不需要参数，插入
             if n==69:
                 opcode=opcode[:c]+bytearray([50,83])+opcode[c+1:]
+                old_addr=old_addr[:c]+[old_addr[c]]*2+old_addr[c+1:]
 
             # 210相当于COMPARE_OP接POP_JUMP_IF_FALSE
             if n==210:
@@ -328,6 +334,7 @@ class _Marshaller:
                 opcode[c]=153
                 opcode[c+3]=153
                 opcode=opcode[:c+6]+bytearray([8])+opcode[c+6:]
+                old_addr=old_addr[:c+6]+[old_addr[c+5]]+old_addr[c+6:]
 
             # 207相当于 STORE_NAME LOAD_CONST
             if n==207:
@@ -344,6 +351,7 @@ class _Marshaller:
                 opcode[c]=155
                 opcode[c+3]=131
                 opcode=opcode[:c+6]+bytearray([38])+opcode[c+6:]
+                old_addr=old_addr[:c+6]+[old_addr[c+5]]+old_addr[c+6:]
 
             try:
                 n = self._opmap[opcode[c]]
@@ -353,6 +361,56 @@ class _Marshaller:
                 # n=255
 
             opcode[c] = n
+
+            if n < 90:
+                c += 1
+            else:
+                c += 3
+
+        c=0
+        while c<len(opcode):
+            n = opcode[c]
+
+            #define JUMP_FORWARD	110	/* Number of bytes to skip */
+            if n==110:
+                to_skip = opcode[c+1] + (opcode[c+2]<<8)
+
+                self_old_addr=old_addr[c+3]
+                self_new_addr= old_addr.index(self_old_addr)
+
+                target_old_addr=self_old_addr+to_skip
+                target_new_addr=old_addr.index(target_old_addr)
+
+                new_to_skip=target_new_addr-self_new_addr
+
+                opcode[c+1]= new_to_skip%(1<<8)
+                opcode[c+2]= new_to_skip>>8
+                pass
+
+            #define JUMP_IF_FALSE_OR_POP 111 /* Target byte offset from beginning of code */
+            if n==111:
+                print("!!!! JUMP_IF_FALSE_OR_POP")
+                pass
+
+            #define JUMP_IF_TRUE_OR_POP 112	/* "" */
+            if n==112:
+                print("!!!! JUMP_IF_TRUE_OR_POP")
+                pass
+
+            #define JUMP_ABSOLUTE	113	/* "" */
+            if n==113:
+                print("!!!! JUMP_ABSOLUTE")
+                pass
+
+            #define POP_JUMP_IF_FALSE 114	/* "" */
+            if n==114:
+                print("!!!! POP_JUMP_IF_FALSE")
+                pass
+
+            #define POP_JUMP_IF_TRUE 115	/* "" */
+            if n==115:
+                print("!!!! POP_JUMP_IF_TRUE")
+                pass
 
             if n < 90:
                 c += 1
