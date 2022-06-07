@@ -24,7 +24,7 @@ def decrypt_pyc(data):
 if __name__ == '__main__':
     with open(sys.argv[1], "rb") as infile:
         data = infile.read()
-        pyc_filename, pyc_content = decrypt_pyc(data, need_pyc_header=True)
+        pyc_filename, pyc_content = decrypt_pyc(data)
         print(pyc_filename)
         with open(sys.argv[2], 'wb') as fd:
             fd.write(pyc_content)
