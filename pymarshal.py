@@ -390,6 +390,11 @@ class _Marshaller:
                 opcode[c]=153
                 opcode[c+3]=131
 
+            # 185相当于LOAD_FAST STORE_ATTR
+            if n==185:
+                opcode[c]=97
+                opcode[c+3]=132
+
             try:
                 n = self._opmap[opcode[c]]
             except:
