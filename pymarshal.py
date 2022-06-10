@@ -410,49 +410,49 @@ class _Marshaller:
                 c += 3
 
         c=0
-        while c<len(opcode):
+        while c < len(opcode):
             n = opcode[c]
 
             #define JUMP_FORWARD	110	/* Number of bytes to skip */
-            if n==110:
-                to_skip = opcode[c+1] + (opcode[c+2]<<8)
+            if n == 110:
+                to_skip = opcode[c+1] + (opcode[c+2] << 8)
 
-                self_old_addr=old_addr[c+3]
-                self_new_addr= old_addr.index(self_old_addr)
+                self_old_addr = old_addr[c+3]
+                self_new_addr = old_addr.index(self_old_addr)
 
-                target_old_addr=self_old_addr+to_skip
-                target_new_addr=old_addr.index(target_old_addr)
+                target_old_addr = self_old_addr+to_skip
+                target_new_addr = old_addr.index(target_old_addr)
 
-                new_to_skip=target_new_addr-self_new_addr
+                new_to_skip = target_new_addr-self_new_addr
 
-                opcode[c+1]= new_to_skip%(1<<8)
-                opcode[c+2]= new_to_skip>>8
+                opcode[c+1] = new_to_skip % (1 << 8)
+                opcode[c+2] = new_to_skip >> 8
+
+                print("!!!! JUMP_FORWARD %d %d" % (to_skip, new_to_skip))
                 pass
 
             #define JUMP_IF_FALSE_OR_POP 111 /* Target byte offset from beginning of code */
-            if n==111:
-                print("!!!! JUMP_IF_FALSE_OR_POP")
-                pass
-
             #define JUMP_IF_TRUE_OR_POP 112	/* "" */
-            if n==112:
-                print("!!!! JUMP_IF_TRUE_OR_POP")
-                pass
-
             #define JUMP_ABSOLUTE	113	/* "" */
-            if n==113:
-                print("!!!! JUMP_ABSOLUTE")
-                pass
-
             #define POP_JUMP_IF_FALSE 114	/* "" */
-            if n==114:
-                print("!!!! POP_JUMP_IF_FALSE")
-                pass
-
             #define POP_JUMP_IF_TRUE 115	/* "" */
-            if n==115:
-                print("!!!! POP_JUMP_IF_TRUE")
-                pass
+            if n == 111 or n == 112 or n == 113 or n == 114 or n == 115:
+
+                target = opcode[c+1]+(opcode[c+2] << 8)
+                new_target = old_addr.index(target)
+                opcode[c+1] = new_target % (1 << 8)
+                opcode[c+2] = new_target >> 8
+
+                if n == 111:
+                    print("!!!! JUMP_IF_FALSE_OR_POP %d %d" % (target, new_target))
+                if n == 112:
+                    print("!!!! JUMP_IF_TRUE_OR_POP %d %d" % (target, new_target))
+                if n == 113:
+                    print("!!!! JUMP_ABSOLUTE %d %d" % (target, new_target))
+                if n == 114:
+                    print("!!!! POP_JUMP_IF_FALSE %d %d" % (target, new_target))
+                if n == 115:
+                    print("!!!! POP_JUMP_IF_TRUE %d %d" % (target, new_target))
 
             if n < 90:
                 c += 1
