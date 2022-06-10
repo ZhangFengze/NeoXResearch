@@ -402,6 +402,11 @@ class _Marshaller:
                 opcode=opcode[:c+6]+bytearray([38])+opcode[c+6:]
                 old_addr=old_addr[:c+6]+[old_addr[c+5]]+old_addr[c+6:]
 
+            # 215相当于LOAD_CONST COMPARE_OP
+            if n==215:
+                opcode[c]=153
+                opcode[c+3]=114
+
             try:
                 n = self._opmap[opcode[c]]
             except:
