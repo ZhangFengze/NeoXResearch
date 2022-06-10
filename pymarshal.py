@@ -433,7 +433,11 @@ class _Marshaller:
             n = opcode[c]
 
             #define JUMP_FORWARD	110	/* Number of bytes to skip */
-            if n == 110:
+            #define SETUP_LOOP	120	/* Target address (relative) */
+            #define SETUP_EXCEPT	121	/* "" */
+            #define SETUP_FINALLY	122	/* "" */
+            #define SETUP_WITH 143
+            if n==110 or n==120 or n==121 or n==122 or n==143:
                 to_skip = opcode[c+1] + (opcode[c+2] << 8)
 
                 self_old_addr = old_addr[c+3]
