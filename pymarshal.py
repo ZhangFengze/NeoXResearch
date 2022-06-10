@@ -395,6 +395,13 @@ class _Marshaller:
                 opcode[c]=97
                 opcode[c+3]=132
 
+            # 162相当于LOAD_FAST CALL_FUNCTION POP_TOP
+            if n==162:
+                opcode[c]=97
+                opcode[c+3]=131
+                opcode=opcode[:c+6]+bytearray([38])+opcode[c+6:]
+                old_addr=old_addr[:c+6]+[old_addr[c+5]]+old_addr[c+6:]
+
             try:
                 n = self._opmap[opcode[c]]
             except:
