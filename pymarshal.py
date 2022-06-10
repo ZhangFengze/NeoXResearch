@@ -450,8 +450,6 @@ class _Marshaller:
 
                 opcode[c+1] = new_to_skip % (1 << 8)
                 opcode[c+2] = new_to_skip >> 8
-
-                print("!!!! JUMP_FORWARD %d %d" % (to_skip, new_to_skip))
                 pass
 
             #define JUMP_IF_FALSE_OR_POP 111 /* Target byte offset from beginning of code */
@@ -465,17 +463,6 @@ class _Marshaller:
                 new_target = old_addr.index(target)
                 opcode[c+1] = new_target % (1 << 8)
                 opcode[c+2] = new_target >> 8
-
-                if n == 111:
-                    print("!!!! JUMP_IF_FALSE_OR_POP %d %d" % (target, new_target))
-                if n == 112:
-                    print("!!!! JUMP_IF_TRUE_OR_POP %d %d" % (target, new_target))
-                if n == 113:
-                    print("!!!! JUMP_ABSOLUTE %d %d" % (target, new_target))
-                if n == 114:
-                    print("!!!! POP_JUMP_IF_FALSE %d %d" % (target, new_target))
-                if n == 115:
-                    print("!!!! POP_JUMP_IF_TRUE %d %d" % (target, new_target))
 
             if n < 90:
                 c += 1
