@@ -380,6 +380,16 @@ class _Marshaller:
                 opcode[c]=155
                 opcode[c+3]=131
 
+            # 190相当于LOAD_CONST IMPORT_NAME
+            if n==190:
+                opcode[c]=153
+                opcode[c+3]=134
+
+            # 209相当于LOAD_CONST CALL_FUNCTION
+            if n==209:
+                opcode[c]=153
+                opcode[c+3]=131
+
             try:
                 n = self._opmap[opcode[c]]
             except:
