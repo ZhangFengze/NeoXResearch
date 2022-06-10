@@ -407,6 +407,13 @@ class _Marshaller:
                 opcode[c]=153
                 opcode[c+3]=114
 
+            # 188相当于LOAD_CONST BINARY_SUBSCR
+            # BINARY_SUBSCR不需要参数，插入
+            if n==188:
+                opcode[c]=153
+                opcode=opcode[:c+3]+ bytearray([10]) + opcode[c+3:]
+                old_addr=old_addr[:c+3]+[old_addr[c+2]]+old_addr[c+3:]
+
             try:
                 n = self._opmap[opcode[c]]
             except:
