@@ -1,8 +1,21 @@
-import os
-import pathlib
+import pathlib2
 import sys
 import lz4.block
 import mmh3
+import struct
+
+
+def BytesToUInt32(bytes):
+    # return int.from_bytes(bytes, byteorder="little", signed=False)
+    return struct.unpack("<I", bytes)[0]
+
+
+def BytesToUInt16(bytes):
+    return struct.unpack("<H", bytes)[0]
+
+
+def BytesToUInt8(bytes):
+    return struct.unpack("<B", bytes)[0]
 
 
 def StringID(s):
@@ -10,28 +23,27 @@ def StringID(s):
 
 
 def main(npk, outDir):
-    os.makedirs(outDir, exist_ok=True)
+    pathlib2.Path(outDir).mkdir(exist_ok=True, parents=True)
     with open(npk, "rb") as infile:
         content = infile.read()
         magic = content[0:4]
         assert(magic == b'NXPK')
 
-        fileCount = int.from_bytes(content[4:8], "little")
-        print(f"{fileCount} files")
+        fileCount = BytesToUInt32(content[4:8])
 
-        entriesOffset = int.from_bytes(content[20:24], "little")
+        entriesOffset = BytesToUInt32(content[20:24])
         entries = content[entriesOffset:entriesOffset+28*fileCount]
 
         for i in range(fileCount):
             entry = entries[i*28:i*28+28]
 
-            id = int.from_bytes(entry[:4], "little")
-            offset = int.from_bytes(entry[4:8], "little")
-            inNpkSize = int.from_bytes(entry[8:12], "little")
-            plainSize = int.from_bytes(entry[12:16], "little")
-            compressType = int.from_bytes(entry[24:26], "little")
-            encryptType = int.from_bytes(entry[26:27], "little")
-            print(f"entry:{i}    id:{id:0X}    offset:{offset:08X}    inNpkSize:{inNpkSize:6}    plainSize:{plainSize:6}   compressType:{compressType}   entryptType:{encryptType}")
+            id = BytesToUInt32(entry[:4])
+            id = "%08X" % (id)
+            offset = BytesToUInt32(entry[4:8])
+            inNpkSize = BytesToUInt32(entry[8:12])
+            plainSize = BytesToUInt32(entry[12:16])
+            compressType = BytesToUInt16(entry[24:26])
+            encryptType = BytesToUInt8(entry[26:27])
 
             assert(compressType == 2)
             assert(encryptType == 0)
@@ -39,10 +51,10 @@ def main(npk, outDir):
             decompressed = lz4.block.decompress(
                 compressed, uncompressed_size=plainSize)
 
-            with open(pathlib.Path(outDir)/f"{id:08X}", "wb") as outfile:
+            with open(str(pathlib2.Path(outDir) / id), "wb") as outfile:
                 outfile.write(decompressed)
 
-        print(f'redirect.nxs -> {StringID("redirect.nxs"):08X}')
+        print("redirect.nxs -> %08X" % (StringID("redirect.nxs")))
 
 
 if __name__ == "__main__":
