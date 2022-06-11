@@ -432,6 +432,12 @@ class _Marshaller:
                 opcode=opcode[:c]+bytearray([38,153])+opcode[c+1:]
                 old_addr=old_addr[:c]+[old_addr[c]]*2+old_addr[c+1:]
 
+            # 180相当于POP_TOP JUMP_FORWARD
+            # POP_TOP无参，插入
+            if n==180:
+                opcode=opcode[:c]+bytearray([38,156])+opcode[c+1:]
+                old_addr=old_addr[:c]+[old_addr[c]]*2+old_addr[c+1:]
+
 
             try:
                 n = self._opmap[opcode[c]]
