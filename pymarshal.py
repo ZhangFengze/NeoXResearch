@@ -445,6 +445,16 @@ class _Marshaller:
                 opcode=opcode[:c+3]+bytearray([8])+opcode[c+3:]
                 old_addr=old_addr[:c+3]+[old_addr[c+2]]+old_addr[c+3:]
 
+            # 119相当于STORE_FAST LOAD_FAST
+            if n==119:
+                opcode[c]=104
+                opcode[c+3]=97
+
+            # 199相当于STORE_FAST LOAD_GLOBAL
+            if n==199:
+                opcode[c]=104
+                opcode[c+3]=155
+
 
             try:
                 n = self._opmap[opcode[c]]
