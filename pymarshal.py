@@ -438,6 +438,13 @@ class _Marshaller:
                 opcode=opcode[:c]+bytearray([38,156])+opcode[c+1:]
                 old_addr=old_addr[:c]+[old_addr[c]]*2+old_addr[c+1:]
 
+            # 248相当于LOAD_CONST STORE_MAP
+            # STORE_MAP无参，插入
+            if n==248:
+                opcode[c]=153
+                opcode=opcode[:c+3]+bytearray([8])+opcode[c+3:]
+                old_addr=old_addr[:c+3]+[old_addr[c+2]]+old_addr[c+3:]
+
 
             try:
                 n = self._opmap[opcode[c]]
