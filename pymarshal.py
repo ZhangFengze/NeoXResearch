@@ -414,6 +414,25 @@ class _Marshaller:
                 opcode=opcode[:c+3]+ bytearray([10]) + opcode[c+3:]
                 old_addr=old_addr[:c+3]+[old_addr[c+2]]+old_addr[c+3:]
 
+            # 79相当于POP_TOP POP_TOP POP_TOP
+            # 都无参，插入
+            if n==79:
+                opcode=opcode[:c]+bytearray([38,38,38])+opcode[c+1:]
+                old_addr=old_addr[:c]+[old_addr[c]]*3+old_addr[c+1:]
+            
+            # 20相当于BINARY_SUBSCR RETURN_VALUE
+            # 都无参，插入
+            if n==20:
+                opcode=opcode[:c]+bytearray([10,83])+opcode[c+1:]
+                old_addr=old_addr[:c]+[old_addr[c]]*2+old_addr[c+1:]
+
+            # 222相当于POP_TOP LOAD_CONST
+            # POP_TOP无参，插入
+            if n==222:
+                opcode=opcode[:c]+bytearray([38,153])+opcode[c+1:]
+                old_addr=old_addr[:c]+[old_addr[c]]*2+old_addr[c+1:]
+
+
             try:
                 n = self._opmap[opcode[c]]
             except:
