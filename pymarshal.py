@@ -457,7 +457,11 @@ class _Marshaller:
 
 
             try:
-                n = self._opmap[opcode[c]]
+                # 手动补充 std ExTENDED_ARG 145 -> neox 160 
+                if n==160:
+                    n=145
+                else:
+                    n = self._opmap[opcode[c]]
             except:
                 print("unknown %s" % opcode[c])
                 # print("unknown %s, set 255" % opcode[c])
