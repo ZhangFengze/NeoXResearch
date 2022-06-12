@@ -456,10 +456,16 @@ class _Marshaller:
                 opcode[c+3]=155
 
             # 62相当于POP_TOP POP_BLOCK
-            # 都不要参数
+            # 都无参，插入
             if n==62:
                 opcode=opcode[:c]+bytearray([38,72])+opcode[c+1:]
                 old_addr=old_addr[:c]+[old_addr[c]]*2+old_addr[c+1:]
+
+            # 146相当于LOAD_CONST LOAD_CONST BUILD_TUPLE
+            if n==146:
+                opcode[c]=153
+                opcode[c+3]=153
+                opcode[c+6]=135
 
 
             try:
