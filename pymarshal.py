@@ -490,12 +490,13 @@ class _Marshaller:
         while c < len(opcode):
             n = opcode[c]
 
+            #define FOR_ITER	93
             #define JUMP_FORWARD	110	/* Number of bytes to skip */
             #define SETUP_LOOP	120	/* Target address (relative) */
             #define SETUP_EXCEPT	121	/* "" */
             #define SETUP_FINALLY	122	/* "" */
             #define SETUP_WITH 143
-            if n==110 or n==120 or n==121 or n==122 or n==143:
+            if n==93 or n==110 or n==120 or n==121 or n==122 or n==143:
                 to_skip = opcode[c+1] + (opcode[c+2] << 8)
 
                 self_old_addr = old_addr[c+3]
@@ -515,7 +516,8 @@ class _Marshaller:
             #define JUMP_ABSOLUTE	113	/* "" */
             #define POP_JUMP_IF_FALSE 114	/* "" */
             #define POP_JUMP_IF_TRUE 115	/* "" */
-            if n == 111 or n == 112 or n == 113 or n == 114 or n == 115:
+            #define CONTINUE_LOOP	119	/* Start of loop (absolute) */
+            if n == 111 or n == 112 or n == 113 or n == 114 or n == 115 or n==119:
 
                 target = opcode[c+1]+(opcode[c+2] << 8)
                 new_target = old_addr.index(target)
