@@ -239,9 +239,6 @@ class _Marshaller:
             n = opcode[c]
             if n == 160:
                 print("!!!! 160")
-            
-            if n== 110:
-                print("!!!! 110")
 
             # 169相当于LOAD_CONST接LOAD_CONST
             if n == 169:
