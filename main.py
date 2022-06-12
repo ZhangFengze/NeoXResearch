@@ -41,7 +41,7 @@ if __name__ == "__main__":
             pyPath = pathlib2.Path(sys.argv[3])/filename
             decompileSuccess = os.system(
                 "uncompyle6 -o %s %s" % (str(pyPath), str(pycPath)))
-            if not decompileSuccess:
+            if decompileSuccess != 0:
                 failedFiles.append((str(file), str(pycPath)))
 
     print("failed with:")
