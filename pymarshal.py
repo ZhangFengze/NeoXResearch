@@ -455,6 +455,12 @@ class _Marshaller:
                 opcode[c]=104
                 opcode[c+3]=155
 
+            # 62相当于POP_TOP POP_BLOCK
+            # 都不要参数
+            if n==62:
+                opcode=opcode[:c]+bytearray([38,72])+opcode[c+1:]
+                old_addr=old_addr[:c]+[old_addr[c]]*2+old_addr[c+1:]
+
 
             try:
                 # 手动补充 std ExTENDED_ARG 145 -> neox 160 
