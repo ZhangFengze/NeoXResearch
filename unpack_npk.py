@@ -23,6 +23,8 @@ def StringID(s):
 
 
 def main(npk, outDir):
+    redirectID = "%08X" % (StringID("redirect.nxs"))
+
     pathlib2.Path(outDir).mkdir(exist_ok=True, parents=True)
     with open(npk, "rb") as infile:
         content = infile.read()
@@ -51,10 +53,9 @@ def main(npk, outDir):
             decompressed = lz4.block.decompress(
                 compressed, uncompressed_size=plainSize)
 
-            with open(str(pathlib2.Path(outDir) / id), "wb") as outfile:
+            name = "redirect.nxs" if id == redirectID else id
+            with open(str(pathlib2.Path(outDir) / name), "wb") as outfile:
                 outfile.write(decompressed)
-
-        print("redirect.nxs -> %08X" % (StringID("redirect.nxs")))
 
 
 if __name__ == "__main__":
