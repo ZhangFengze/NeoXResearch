@@ -10,24 +10,37 @@
   
 ## 关键点
 网上已有一些前人工作可供参考，但更新大多停留在几年前（2017~2019年）左右，已经失效了，不能直接拿来用  
+
 主要有以下变化：
-* 之前so会导出CPython一些函数，现在不再导出
+* 之前so会导出一些CPython函数，现在不再导出
 * 之前pyc混淆只调换了opcode的定义，现在增加了新opcode
 * 部分函数从纯python实现改成了native注册给python实现
+  
+#### 找出CPython关键函数
+NeoX内置了CPython，并魔改了一部分源码，我们需要找到关键函数比如Py_Initialize以便分析  
+##### 确认CPython版本
+首先确认NeoX使用的CPython版本，以便参考源码  
 
-#### 确认是否是neox引擎
-解包看是否有大量NeoX相关
+CPython有很多调试字符串，里面记录了源文件路径，我们可以借此得到python主次版本号  
 
-#### 确认CPython版本
-NeoX魔改了CPython，确认NeoX的CPython版本，以便参考源码。  
+IDA Pro打开核心so库，开Strings窗口，搜python  
 
-CPython有很多调试字符串，里面记录了源文件路径，我们可以借此得到python主次版本号。  
-IDA Pro打开核心so库，开Strings窗口，搜python    
-![image](https://user-images.githubusercontent.com/21135715/171880588-df7fbaec-d307-443d-925f-c8458eac20d5.png)  
+可以搜到类似 engine/NeoX/src/3d-engine/branches/mobile/engine/python27/Objects/classobject.c 的字符串，即可确认主次版本号为2.7  
 
 CPython定义了PY_VERSION字符串，格式是MAJOR.MINOR.PATCH，我们再次搜索2.7.  
-![image](https://user-images.githubusercontent.com/21135715/171880752-0c2db9c7-5b09-439a-b60b-d40bc072a415.png)  
-可得到完整版本号为2.7.3
+
+可以搜到2.7.3，即可确认完整版本号  
+
+#### 对照CPython源码分析
+拿到版本号后，去CPython官方仓库取对应源码  
+
+例如我们要找Py_Initialize函数，可以看到源码中有很多字符串，例如 Py_Initialize: can't make first interpreter  
+
+编译器会优化代码等，但是不做特殊处理的话，字符串一般是不会改的  
+
+我们继续IDA Pro的Strings窗口中直接搜索  
+
+搜到了以后找对该字符串的引用，发现只有一个是函数，点进去看，基本和源码长得差不多，即可确认找到了目标函数
 
 #### 获得opcode映射表
 由前人工作，可知NeoX修改了CPython的opcode定义。可以看反汇编代码，也可以对比魔改的Python产生的pyc与原版，得到映射关系。  
