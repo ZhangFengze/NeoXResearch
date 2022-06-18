@@ -495,7 +495,7 @@ class _Marshaller:
             if n == 93 or n == 110 or n == 120 or n == 121 or n == 122 or n == 143:
                 to_skip = opcode[c+1] + (opcode[c+2] << 8)
 
-                self_old_addr = old_addr[c+3]
+                self_old_addr = old_addr[c]+3
                 self_new_addr = old_addr.index(self_old_addr)
 
                 target_old_addr = self_old_addr+to_skip
