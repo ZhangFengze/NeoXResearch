@@ -230,9 +230,9 @@ class _Marshaller:
     def _transform_opcode(self, x):
         if not self._opmap:
             return x
-            
+
         opcode = bytearray(x)
-        old_addr = range(len(x)) # 记录对应的旧地址，用来修复jump
+        old_addr = range(len(x))  # 记录对应的旧地址，用来修复jump
 
         c = 0
         while c < len(opcode):
@@ -242,233 +242,232 @@ class _Marshaller:
 
             # 169相当于LOAD_CONST接LOAD_CONST
             if n == 169:
-                opcode[c]=153
-                opcode[c+3]=153
+                opcode[c] = 153
+                opcode[c+3] = 153
 
             # 186相当于LOAD_CONST接MAKE_FUNCTION
-            if n==186:
-                opcode[c]=153
-                opcode[c+3]=136
+            if n == 186:
+                opcode[c] = 153
+                opcode[c+3] = 136
 
             # 202相当于LOAD_ATTR接LOAD_ATTR
-            if n==202:
-                opcode[c]=96
-                opcode[c+3]=96
-            
+            if n == 202:
+                opcode[c] = 96
+                opcode[c+3] = 96
+
             # 143相当于CALL_FUNCTION接POP_TOP
             # POP_TOP无参，插入到后面
-            if n==143:
-                opcode[c]=131
-                opcode=opcode[:c+3]+ bytearray([38]) + opcode[c+3:]
-                old_addr=old_addr[:c+3]+[old_addr[c+2]]+old_addr[c+3:]
+            if n == 143:
+                opcode[c] = 131
+                opcode = opcode[:c+3] + bytearray([38]) + opcode[c+3:]
+                old_addr = old_addr[:c+3]+[old_addr[c+2]]+old_addr[c+3:]
 
             # 231相当于LOAD_CONST接RETURN_VALUE
             # RETURN_VALUE无参，插入到后面
-            if n==231:
-                opcode[c]=153
-                opcode=opcode[:c+3]+ bytearray([83]) + opcode[c+3:]
-                old_addr=old_addr[:c+3]+[old_addr[c+2]]+old_addr[c+3:]
+            if n == 231:
+                opcode[c] = 153
+                opcode = opcode[:c+3] + bytearray([83]) + opcode[c+3:]
+                old_addr = old_addr[:c+3]+[old_addr[c+2]]+old_addr[c+3:]
 
             # 173相当于LOAD_FAST 0 接LOAD_CONST
             # LOAD_FAST参数固定0
-            if n==173:
-                opcode=opcode[:c]+bytearray([97,0,0,153])+opcode[c+1:]
-                old_addr=old_addr[:c]+[old_addr[c]]*4+old_addr[c+1:]
+            if n == 173:
+                opcode = opcode[:c]+bytearray([97, 0, 0, 153])+opcode[c+1:]
+                old_addr = old_addr[:c]+[old_addr[c]]*4+old_addr[c+1:]
 
             # 203相当于LOAD_FAST接LOAD_FAST
-            if n==203:
-                opcode[c]=97
-                opcode[c+3]=97
+            if n == 203:
+                opcode[c] = 97
+                opcode[c+3] = 97
 
             # 124相当于LOAD_FAST接LOAD_CONST
-            if n==124:
-                opcode[c]=97
-                opcode[c+3]=153
+            if n == 124:
+                opcode[c] = 97
+                opcode[c+3] = 153
 
             # 227相当于LOAD_FAST接LOAD_ATTR
-            if n==227:
-                opcode[c]=97
-                opcode[c+3]=96
+            if n == 227:
+                opcode[c] = 97
+                opcode[c+3] = 96
 
             # 205相当于LOAD_FAST接CALL_FUNCTION
-            if n==205:
-                opcode[c]=97
-                opcode[c+3]=131
+            if n == 205:
+                opcode[c] = 97
+                opcode[c+3] = 131
 
             # 208相当于LOAD_GLOBAL接LOAD_FAST
-            if n==208:
-                opcode[c]=155
-                opcode[c+3]=97
+            if n == 208:
+                opcode[c] = 155
+                opcode[c+3] = 97
 
             # 247相当于CALL_FUNCTION接STORE_FAST
-            if n==247:
-                opcode[c]=131
-                opcode[c+3]=104
+            if n == 247:
+                opcode[c] = 131
+                opcode[c+3] = 104
 
             # 168相当于LOAD_ATTR接LOAD_FAST
-            if n==168:
-                opcode[c]=96
-                opcode[c+3]=97
+            if n == 168:
+                opcode[c] = 96
+                opcode[c+3] = 97
 
             # 194相当于MAKE_FUNCTION接STORE_NAME
-            if n==194:
-                opcode[c]=136
-                opcode[c+3]=145
+            if n == 194:
+                opcode[c] = 136
+                opcode[c+3] = 145
 
             # 69相当于LOAD_LOCALS接RETURN_VALUE
             # 都不需要参数，插入
-            if n==69:
-                opcode=opcode[:c]+bytearray([50,83])+opcode[c+1:]
-                old_addr=old_addr[:c]+[old_addr[c]]*2+old_addr[c+1:]
+            if n == 69:
+                opcode = opcode[:c]+bytearray([50, 83])+opcode[c+1:]
+                old_addr = old_addr[:c]+[old_addr[c]]*2+old_addr[c+1:]
 
             # 210相当于COMPARE_OP接POP_JUMP_IF_FALSE
-            if n==210:
-                opcode[c]=114
-                opcode[c+3]=148
+            if n == 210:
+                opcode[c] = 114
+                opcode[c+3] = 148
 
             # 220相当于 LOAD_CONST LOAD_CONST STORE_MAP
-            if n==220:
-                opcode[c]=153
-                opcode[c+3]=153
-                opcode=opcode[:c+6]+bytearray([8])+opcode[c+6:]
-                old_addr=old_addr[:c+6]+[old_addr[c+5]]+old_addr[c+6:]
+            if n == 220:
+                opcode[c] = 153
+                opcode[c+3] = 153
+                opcode = opcode[:c+6]+bytearray([8])+opcode[c+6:]
+                old_addr = old_addr[:c+6]+[old_addr[c+5]]+old_addr[c+6:]
 
             # 207相当于 STORE_NAME LOAD_CONST
-            if n==207:
-                opcode[c]=145
-                opcode[c+3]=153
+            if n == 207:
+                opcode[c] = 145
+                opcode[c+3] = 153
 
             # 214相当于 CALL_FUNCTION CALL_FUNCTION
-            if n==214:
-                opcode[c]=131
-                opcode[c+3]=131
+            if n == 214:
+                opcode[c] = 131
+                opcode[c+3] = 131
 
             # 201相当于LOAD_GLOBAL CALL_FUNCTION POP_TOP
-            if n==201:
-                opcode[c]=155
-                opcode[c+3]=131
-                opcode=opcode[:c+6]+bytearray([38])+opcode[c+6:]
-                old_addr=old_addr[:c+6]+[old_addr[c+5]]+old_addr[c+6:]
+            if n == 201:
+                opcode[c] = 155
+                opcode[c+3] = 131
+                opcode = opcode[:c+6]+bytearray([38])+opcode[c+6:]
+                old_addr = old_addr[:c+6]+[old_addr[c+5]]+old_addr[c+6:]
 
             # 179相当于LOAD_ATTR CALL_FUNCTION
-            if n==179:
-                opcode[c]=96
-                opcode[c+3]=131
+            if n == 179:
+                opcode[c] = 96
+                opcode[c+3] = 131
 
             # 192相当于LOAD_ATTR LOAD_GLOBAL
-            if n==192:
-                opcode[c]=96
-                opcode[c+3]=155
+            if n == 192:
+                opcode[c] = 96
+                opcode[c+3] = 155
 
             # 150相当于LOAD_ATTR CALL_FUNCTION POP_TOP
-            if n==150:
-                opcode[c]=96
-                opcode[c+3]=131
-                opcode=opcode[:c+6]+bytearray([38])+opcode[c+6:]
-                old_addr=old_addr[:c+6]+[old_addr[c+5]]+old_addr[c+6:]
+            if n == 150:
+                opcode[c] = 96
+                opcode[c+3] = 131
+                opcode = opcode[:c+6]+bytearray([38])+opcode[c+6:]
+                old_addr = old_addr[:c+6]+[old_addr[c+5]]+old_addr[c+6:]
 
             # 98相当于LOAD_CONST LOAD_FAST
-            if n==98:
-                opcode[c]=153
-                opcode[c+3]=97
-            
+            if n == 98:
+                opcode[c] = 153
+                opcode[c+3] = 97
+
             # 244相当于LOAD_GLOBAL CALL_FUNCTION
-            if n==244:
-                opcode[c]=155
-                opcode[c+3]=131
+            if n == 244:
+                opcode[c] = 155
+                opcode[c+3] = 131
 
             # 190相当于LOAD_CONST IMPORT_NAME
-            if n==190:
-                opcode[c]=153
-                opcode[c+3]=134
+            if n == 190:
+                opcode[c] = 153
+                opcode[c+3] = 134
 
             # 209相当于LOAD_CONST CALL_FUNCTION
-            if n==209:
-                opcode[c]=153
-                opcode[c+3]=131
+            if n == 209:
+                opcode[c] = 153
+                opcode[c+3] = 131
 
             # 185相当于LOAD_FAST STORE_ATTR
-            if n==185:
-                opcode[c]=97
-                opcode[c+3]=132
+            if n == 185:
+                opcode[c] = 97
+                opcode[c+3] = 132
 
             # 162相当于LOAD_FAST CALL_FUNCTION POP_TOP
-            if n==162:
-                opcode[c]=97
-                opcode[c+3]=131
-                opcode=opcode[:c+6]+bytearray([38])+opcode[c+6:]
-                old_addr=old_addr[:c+6]+[old_addr[c+5]]+old_addr[c+6:]
+            if n == 162:
+                opcode[c] = 97
+                opcode[c+3] = 131
+                opcode = opcode[:c+6]+bytearray([38])+opcode[c+6:]
+                old_addr = old_addr[:c+6]+[old_addr[c+5]]+old_addr[c+6:]
 
             # 215相当于LOAD_CONST COMPARE_OP
-            if n==215:
-                opcode[c]=153
-                opcode[c+3]=114
+            if n == 215:
+                opcode[c] = 153
+                opcode[c+3] = 114
 
             # 188相当于LOAD_CONST BINARY_SUBSCR
             # BINARY_SUBSCR不需要参数，插入
-            if n==188:
-                opcode[c]=153
-                opcode=opcode[:c+3]+ bytearray([10]) + opcode[c+3:]
-                old_addr=old_addr[:c+3]+[old_addr[c+2]]+old_addr[c+3:]
+            if n == 188:
+                opcode[c] = 153
+                opcode = opcode[:c+3] + bytearray([10]) + opcode[c+3:]
+                old_addr = old_addr[:c+3]+[old_addr[c+2]]+old_addr[c+3:]
 
             # 79相当于POP_TOP POP_TOP POP_TOP
             # 都无参，插入
-            if n==79:
-                opcode=opcode[:c]+bytearray([38,38,38])+opcode[c+1:]
-                old_addr=old_addr[:c]+[old_addr[c]]*3+old_addr[c+1:]
-            
+            if n == 79:
+                opcode = opcode[:c]+bytearray([38, 38, 38])+opcode[c+1:]
+                old_addr = old_addr[:c]+[old_addr[c]]*3+old_addr[c+1:]
+
             # 20相当于BINARY_SUBSCR RETURN_VALUE
             # 都无参，插入
-            if n==20:
-                opcode=opcode[:c]+bytearray([10,83])+opcode[c+1:]
-                old_addr=old_addr[:c]+[old_addr[c]]*2+old_addr[c+1:]
+            if n == 20:
+                opcode = opcode[:c]+bytearray([10, 83])+opcode[c+1:]
+                old_addr = old_addr[:c]+[old_addr[c]]*2+old_addr[c+1:]
 
             # 222相当于POP_TOP LOAD_CONST
             # POP_TOP无参，插入
-            if n==222:
-                opcode=opcode[:c]+bytearray([38,153])+opcode[c+1:]
-                old_addr=old_addr[:c]+[old_addr[c]]*2+old_addr[c+1:]
+            if n == 222:
+                opcode = opcode[:c]+bytearray([38, 153])+opcode[c+1:]
+                old_addr = old_addr[:c]+[old_addr[c]]*2+old_addr[c+1:]
 
             # 180相当于POP_TOP JUMP_FORWARD
             # POP_TOP无参，插入
-            if n==180:
-                opcode=opcode[:c]+bytearray([38,156])+opcode[c+1:]
-                old_addr=old_addr[:c]+[old_addr[c]]*2+old_addr[c+1:]
+            if n == 180:
+                opcode = opcode[:c]+bytearray([38, 156])+opcode[c+1:]
+                old_addr = old_addr[:c]+[old_addr[c]]*2+old_addr[c+1:]
 
             # 248相当于LOAD_CONST STORE_MAP
             # STORE_MAP无参，插入
-            if n==248:
-                opcode[c]=153
-                opcode=opcode[:c+3]+bytearray([8])+opcode[c+3:]
-                old_addr=old_addr[:c+3]+[old_addr[c+2]]+old_addr[c+3:]
+            if n == 248:
+                opcode[c] = 153
+                opcode = opcode[:c+3]+bytearray([8])+opcode[c+3:]
+                old_addr = old_addr[:c+3]+[old_addr[c+2]]+old_addr[c+3:]
 
             # 119相当于STORE_FAST LOAD_FAST
-            if n==119:
-                opcode[c]=104
-                opcode[c+3]=97
+            if n == 119:
+                opcode[c] = 104
+                opcode[c+3] = 97
 
             # 199相当于STORE_FAST LOAD_GLOBAL
-            if n==199:
-                opcode[c]=104
-                opcode[c+3]=155
+            if n == 199:
+                opcode[c] = 104
+                opcode[c+3] = 155
 
             # 62相当于POP_TOP POP_BLOCK
             # 都无参，插入
-            if n==62:
-                opcode=opcode[:c]+bytearray([38,72])+opcode[c+1:]
-                old_addr=old_addr[:c]+[old_addr[c]]*2+old_addr[c+1:]
+            if n == 62:
+                opcode = opcode[:c]+bytearray([38, 72])+opcode[c+1:]
+                old_addr = old_addr[:c]+[old_addr[c]]*2+old_addr[c+1:]
 
             # 146相当于LOAD_CONST LOAD_CONST BUILD_TUPLE
-            if n==146:
-                opcode[c]=153
-                opcode[c+3]=153
-                opcode[c+6]=135
-
+            if n == 146:
+                opcode[c] = 153
+                opcode[c+3] = 153
+                opcode[c+6] = 135
 
             try:
-                # 手动补充 std EXTENDED_ARG 145 -> neox 160 
-                if n==160:
-                    n=145
+                # 手动补充 std EXTENDED_ARG 145 -> neox 160
+                if n == 160:
+                    n = 145
                 else:
                     n = self._opmap[opcode[c]]
             except:
@@ -483,17 +482,17 @@ class _Marshaller:
             else:
                 c += 3
 
-        c=0
+        c = 0
         while c < len(opcode):
             n = opcode[c]
 
-            #define FOR_ITER	93
-            #define JUMP_FORWARD	110	/* Number of bytes to skip */
-            #define SETUP_LOOP	120	/* Target address (relative) */
-            #define SETUP_EXCEPT	121	/* "" */
-            #define SETUP_FINALLY	122	/* "" */
-            #define SETUP_WITH 143
-            if n==93 or n==110 or n==120 or n==121 or n==122 or n==143:
+            # define FOR_ITER	93
+            # define JUMP_FORWARD	110	/* Number of bytes to skip */
+            # define SETUP_LOOP	120	/* Target address (relative) */
+            # define SETUP_EXCEPT	121	/* "" */
+            # define SETUP_FINALLY	122	/* "" */
+            # define SETUP_WITH 143
+            if n == 93 or n == 110 or n == 120 or n == 121 or n == 122 or n == 143:
                 to_skip = opcode[c+1] + (opcode[c+2] << 8)
 
                 self_old_addr = old_addr[c+3]
@@ -508,13 +507,13 @@ class _Marshaller:
                 opcode[c+2] = new_to_skip >> 8
                 pass
 
-            #define JUMP_IF_FALSE_OR_POP 111 /* Target byte offset from beginning of code */
-            #define JUMP_IF_TRUE_OR_POP 112	/* "" */
-            #define JUMP_ABSOLUTE	113	/* "" */
-            #define POP_JUMP_IF_FALSE 114	/* "" */
-            #define POP_JUMP_IF_TRUE 115	/* "" */
-            #define CONTINUE_LOOP	119	/* Start of loop (absolute) */
-            if n == 111 or n == 112 or n == 113 or n == 114 or n == 115 or n==119:
+            # define JUMP_IF_FALSE_OR_POP 111 /* Target byte offset from beginning of code */
+            # define JUMP_IF_TRUE_OR_POP 112	/* "" */
+            # define JUMP_ABSOLUTE	113	/* "" */
+            # define POP_JUMP_IF_FALSE 114	/* "" */
+            # define POP_JUMP_IF_TRUE 115	/* "" */
+            # define CONTINUE_LOOP	119	/* Start of loop (absolute) */
+            if n == 111 or n == 112 or n == 113 or n == 114 or n == 115 or n == 119:
 
                 target = opcode[c+1]+(opcode[c+2] << 8)
                 new_target = old_addr.index(target)
