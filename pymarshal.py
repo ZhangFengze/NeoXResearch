@@ -210,7 +210,9 @@ class _Marshaller:
         self.w_long(x.co_flags)
         # self.dump(x.co_code)
 
-        self.dump(self._transform_opcode(x.co_code))
+        transformed_code, transformed_lnotab = self._transform_opcode(
+            x.co_code, x.co_lnotab)
+        self.dump(transformed_code)
 
         self.dump(x.co_consts)
         self.dump(x.co_names)
@@ -220,19 +222,19 @@ class _Marshaller:
         self.dump(x.co_filename)
         self.dump(x.co_name)
         self.w_long(x.co_firstlineno)
-        self.dump(x.co_lnotab)
+        self.dump(transformed_lnotab)
 
     try:
         dispatch[types.CodeType] = dump_code
     except NameError:
         pass
 
-    def _transform_opcode(self, x):
+    def _transform_opcode(self, code, lnotab):
         if not self._opmap:
-            return x
+            return code, lnotab
 
-        opcode = bytearray(x)
-        old_addr = range(len(x))  # 记录对应的旧地址，用来修复jump
+        opcode = bytearray(code)
+        old_addr = range(len(code))  # 记录对应的旧地址，用来修复jump
 
         c = 0
         while c < len(opcode):
@@ -524,7 +526,18 @@ class _Marshaller:
             else:
                 c += 3
 
-        return str(opcode)
+        transformed_lnotab = bytearray()
+        lnotab = bytearray(lnotab)
+        addr = 0
+        new_addr = 0
+        for i in range(len(lnotab)/2):
+            addr += lnotab[i*2]
+            cur_new_addr = old_addr.index(addr)
+            transformed_lnotab += bytearray([cur_new_addr -
+                                            new_addr, lnotab[i*2+1]])
+            new_addr = cur_new_addr
+
+        return str(opcode), str(transformed_lnotab)
 
     def dump_set(self, x):
         self._write(TYPE_SET)
