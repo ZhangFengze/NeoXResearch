@@ -129,25 +129,27 @@ FileLoader读出文件后，如果this+44字节处存储了neox::game::NXEncodeH
 
 额外注意下函数地址，如果运行时总是报illegal instruction，可能是函数地址不对  
 
-arm cpu有两种模式，普通和thumb两种，跳转地址最后一位为0表示普通，1表示thumb mode，如果错了就会报illegal instruction  
+ARM cpu有两种指令集，普通和thumb，跳转地址最后一位为0表示普通，1表示thumb mode，如果错了就会报illegal instruction  
 
 dlsym会自动处理这个，手动算地址的话需要额外修一下函数地址  
 
 拿到opcode映射关系后，着手修复，发现还是有未知opcode  
 
-还是用笨方法，从Python处理opcode的函数看未知opcode的作用，分析其原本含义  
+用笨方法，从Python处理opcode的函数看未知opcode的作用，分析其原本含义  
 
 具体函数是PyEval_EvalFrameEx  
 
 新opcode基本都是旧opcode的组合，需要将新opcode替换成多个旧opcode  
 
-需要注意的是一个opcode变成多个opcode，改变了地址，需要修复带跳转地址指令的参数，以及地址与行数对应关系表  
+需要注意的是一个opcode变成多个opcode，改变了地址，需要修复：  
+1. 带跳转地址指令的参数，详见opcode module的hasjrel hasjabs
+2. 地址与行数对应关系表，lnotab  
 
 #### 修复pyc的其他尝试
 人工分析opcode很麻烦，试图找到其他更简单的方法，但没有成功，做下记录有空继续想  
 
 1. 利用opcode模块（发现不行，NeoXPython没有内置此模块）
-2. 令NeoXPython编译出带新opcode的pyc做对比（没找到如何生成带新opcode的方法，猜测是独立工具或者某个特殊函数没找到；从维护成本上来说，NeoXPython理应只维护一个仓库，所以可能是特殊函数没找到）
+2. 令NeoXPython编译出带新opcode的pyc做对比（没找到如何生成带新opcode的方法，猜测是独立工具或者某个特殊函数没找到）
 3. 令NeoXPython解析pyc得到内存对象，再用原版Python的函数输出（发现不行，内存对象还是实现相关的，需要找一个格式不变的中间对象，没找到）
 
 #### 从pyc得到py源码
