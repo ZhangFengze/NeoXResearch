@@ -145,19 +145,23 @@ dlsym会自动处理这个，手动算地址的话需要额外修一下函数地
 
 需要注意的是一个opcode变成多个opcode，改变了地址，需要修复带跳转地址指令的参数，以及地址与行数对应关系表  
 
-我试图找到其他更简洁的方法，于是翻CPython源码，发现有个opcode模块可以直接打印opcode表。但是NeoX是Embed Python，opcode是py module，没有内置此模块。    
-也没有想到其他的好办法，最后还是用对比pyc的方法拿到了opcode映射表。  
+#### 修复pyc的其他尝试
+人工分析opcode很麻烦，试图找到其他更简单的方法，但没有成功，做下记录有空继续想  
 
-#### 修复无法识别的opcode
-按前人记录，拿到opcode映射表以后就可以解码pyc了。实测后发现，NeoX又额外引入了一些opcode，这些opcode的作用与已有的不同，opcode映射表无法解决这些新opcde。  
-由CPython源码，找到CPython解释执行opcode的实际函数PyEval_EvalFrameEx，对比源码与反汇编代码，得到这些新opcode的作用，基本就是旧opcode的组合。  
-修复opcode时按规则将新opcode换成旧opcode的组合即可。  
-这里可能有更好解法：  
-1.令NeoX Python编译py得到带新opcode的pyc，对比原版。但是NeoX Python常规编译pyc是不带新opcode的。怀疑是有一个特殊的函数，或者独立的工具来编译带新opcode的pyc。NeoX Python只能够接收处理这些opcode，并不能生成。没有细找是否是特殊函数。（也不一定，从维护成本上来说，只魔改一个CPython仓库最好，所以可能是没找到这个特殊函数）  
-2.令NeoX Python解读自己的pyc得到内存对象，再用原版Python函数输出原版pyc。仔细想了下，解读pyc得到的内存对象还是魔改过的一堆opcode，无法直接用原版Python输出。没找到是否有其他中间对象可供转换。（发现AST似乎可以当中间对象，但没有内置的pyc转AST的） 
+1. 利用opcode模块（发现不行，NeoXPython没有内置此模块）
+2. 令NeoXPython编译出带新opcode的pyc做对比（没找到如何生成带新opcode的方法，猜测是独立工具或者某个特殊函数没找到；从维护成本上来说，NeoXPython理应只维护一个仓库，所以可能是特殊函数没找到）
+3. 令NeoXPython解析pyc得到内存对象，再用原版Python的函数输出（发现不行，内存对象还是实现相关的，需要找一个格式不变的中间对象，没找到）
 
-#### 获得内置模块
-NeoX从C++注册了一些模块，大部分不重要，部分重要的，查Python注册模块函数，能搜到模块函数表
+#### 从pyc得到py源码
+uncompyle6可将pyc反编译成py源码  
 
-参考  
+注意python2.7下，uncompyle6处理unicode docstring有问题，也就是中文注释会乱码  
 
+切到python3就好了  
+
+由于NeoXPython是2.7，整个流程都是尽量用2.7做的，切python3要特殊处理下  
+
+#### 获得native注册的函数
+拿到py源码后，会发现一些模块没有源码，搜一下可知是从native注册的  
+
+搜字符串得到Py_InitModule的调用，参数即为模块信息，包含函数地址  
