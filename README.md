@@ -101,17 +101,26 @@ NpkReader::Open读取npk，获得基础信息，构建索引表
 NpkReader::Load使用所需加载文件的元信息，从npk文件中解出目标文件  
 
 #### npk文件格式
-结合这两个函数可以得到npk的格式  
+结合这两个函数可以得到npk的格式如下  
 
+[0:4] must be 'NXPK'  
+[4:8] file count  
+[8:20] unknown  
+[20:24] offset of meta table  
+[24:meta table] data  
+[meta table:meta table+28] meta table entry[0]  
+[meta table+28:meta table+56] meta table entry[1]  
+...  
+[meta table+28\*(file count-1):meta table+28\*file count] meta table entry[file count-1]  
+end of file  
 
-
-
-
-
-
-
-
-
+meta table的每个条目占28字节，具体含义如下  
+[0:4] file id (4 bytes hash)
+[4:8] data offset  
+[8:12] compressed size (in npk size)  
+[12:16] uncompressed size (real file size)  
+[24:26] compress type (0:uncompressed 1:lz4 2:zlib)  
+[26:27] encrypt type (0:unencrypted 1:rc4 2:simple)  
 
 
 #### 修复pyc
