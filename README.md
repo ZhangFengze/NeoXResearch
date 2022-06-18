@@ -16,6 +16,7 @@ fate0的博客 *阴阳师：一个非酋的逆向旅程*  (自行搜索)
 * 之前so会导出一些CPython函数，现在不再导出
 * 之前pyc混淆只调换了opcode的定义，现在增加了新opcode
 * 部分函数从纯python实现改成了native注册给python实现
+* 所有文件都再做了一次加密  
 
 这里仅介绍关键部分 与 基础流程需要修改的部分  
 
@@ -99,6 +100,10 @@ NpkReader真正处理npk格式，前人工作中猜测的npk格式也在此处�
 NpkReader::Open读取npk，获得基础信息，构建索引表  
 
 NpkReader::Load使用所需加载文件的元信息，从npk文件中解出目标文件  
+
+FileLoader读出文件后，如果this+44字节处存储了neox::game::NXEncodeHook实例地址，则调用neox::game::NXEncodeHook的成员函数对文件内容进行解密  
+
+参考链接里的npk解包没有处理这一步解密，导致解出的文件无法识别  
 
 #### npk文件格式
 结合这两个函数可以得到npk的格式如下  
