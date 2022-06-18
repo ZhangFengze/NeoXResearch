@@ -466,7 +466,7 @@ class _Marshaller:
 
 
             try:
-                # 手动补充 std ExTENDED_ARG 145 -> neox 160 
+                # 手动补充 std EXTENDED_ARG 145 -> neox 160 
                 if n==160:
                     n=145
                 else:
