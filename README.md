@@ -86,13 +86,22 @@ neox::filesystem::NXFileLoader是由多种FileLoaderCreator构造的，例如neo
 
 通过动态调试确认上述猜测，应该是采用了常见文件管理方式，优先读取散文件，方便更新与调试，没找到散文件则去资源包读  
 
-NXDiscreteFileLoader::Open直接调用neox::io::input的成员函数，将数据读进buffer  
+NXDiscreteFileLoader::Open直接调用neox::io::Input的成员函数，将数据读进buffer  
 
 neox::io::InputCFile应该是neox::io::input的主要实现，读取函数直接转发到fread  
 
 neox::filesystem::NXNpkLoader::Open遍历了NxPackage，neox::filesystem::NXNpkLoader::NewPackage创建Package，可知实际类型为NxNpk  
 
-NxNpk::Load又转发给NpkReader::Load  
+NxNpk::Load调用NpkReader::Load  
+
+NpkReader真正处理npk格式，前人工作中猜测的npk格式也在此处得到印证  
+
+NpkReader::Open读取npk，获得基础信息，构建索引表  
+
+NpkReader::Load使用所需加载文件的元信息，从npk文件中解出目标文件  
+
+#### npk文件格式
+结合这两个函数可以得到npk的格式  
 
 
 
