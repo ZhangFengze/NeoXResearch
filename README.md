@@ -50,7 +50,7 @@ CPython定义了PY_VERSION字符串，格式是MAJOR.MINOR.PATCH，我们再次�
 
 找到一个函数后，即可根据调用关系进一步找到更多相关函数  
 
-这里推荐多找一些CPython函数，这样之后分析其他代码时用到了CPython函数时比较容易分析  
+这里推荐多找一些CPython函数，这样之后分析其他用到了CPython函数的代码时比较容易分析  
 
 #### 找加载脚本流程
 由前人工作可知，redirect.nxs负责解密脚本  
