@@ -64,25 +64,27 @@ CPython定义了PY_VERSION字符串，格式是MAJOR.MINOR.PATCH，我们再次�
 不出意外的失败了，因为做了混淆，暂且不处理  
 
 #### 找加载文件流程
-暂时不管redirect.nxs，继续顺藤摸瓜分析处理redirect.nxs的函数  
+继续顺藤摸瓜分析处理redirect.nxs的函数  
 
-redirect.nxs的文件内容是从IScriptFileSystem的成员函数调用得到的  
+redirect.nxs文件内容是调用IScriptFileSystem的成员函数得到的  
 
-IScriptFileSystem是通过字符串找出来的，继续搜字符串，找到注册IScriptFileSystem的地方，确认IScriptFileSystem的实际类型是neox::game::FileSystem
+IScriptFileSystem等类似接口是通过查询字符串得到的，应该是做了依赖注入  
+
+继续搜对应字符串的引用，找到注册IScriptFileSystem的地方，确认实际类型是neox::game::FileSystem  
 
 找到neox::game::FileSystem的vtable，其第一个成员函数为读取文件，假设叫ReadFile  
 
-一路分析，可知neox::game::FileSystem::ReadFile调用neox::filesystem::NXFileSystem::Open
+neox::game::FileSystem::ReadFile调用neox::filesystem::NXFileSystem::Open
 
 neox::filesystem::NXFileSystem::Open遍历neox::filesystem::NXFileLoader，采用第一个成功的FileLoader读出的结果  
 
-找neox::filesystem::NXFileLoader的构造，可知是由多种FileLoaderCreator构造的，例如neox::filesystem::NXNpkLoaderCreator::NewLoader  
+neox::filesystem::NXFileLoader是由多种FileLoaderCreator构造的，例如neox::filesystem::NXNpkLoaderCreator::NewLoader  
 
-而所有FileLoaderCreator统一在neox::filesystem::NXFileLoaderCreatorManager::NXFileLoaderCreatorManager中注册自己  
+而所有FileLoaderCreator统一在neox::filesystem::NXFileLoaderCreatorManager中注册自己  
 
 通过名字猜测NXDiscreteFileLoaderCreator对应散文件，优先读取，NXNpkLoaderCreator对应npk  
 
-通过动态调试确认上述猜测，应该是采用了常见手游文件管理方式，游戏发更新时直接将散文件存在文件系统，优先读取，没找到散文件则去资源包读取  
+通过动态调试确认上述猜测，应该是采用了常见文件管理方式，优先读取散文件，方便更新与调试，没找到散文件则去资源包读  
 
 NXDiscreteFileLoader::Open直接调用neox::io::input的成员函数，将数据读进buffer  
 
