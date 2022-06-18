@@ -21,8 +21,6 @@ fate0的博客 *阴阳师：一个非酋的逆向旅程*  (自行搜索)
 
 基础流程见参考链接  
 
-#### 找出CPython关键函数
-NeoX内置了CPython，并魔改了一部分源码，我们需要找到关键函数比如Py_Initialize以便分析  
 
 ##### 确认CPython版本
 首先确认NeoX使用的CPython版本，以便参考源码  
@@ -50,7 +48,7 @@ CPython定义了PY_VERSION字符串，格式是MAJOR.MINOR.PATCH，我们再次�
 
 找到一个函数后，即可根据调用关系进一步找到更多相关函数  
 
-这里推荐多找一些CPython函数，这样之后分析其他用到了CPython函数的代码时比较容易分析  
+推荐多找一些CPython函数，方便之后分析其他用到了CPython函数的代码  
 
 #### 找加载脚本流程
 由前人工作可知，redirect.nxs负责解密脚本  
