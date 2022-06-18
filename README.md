@@ -61,9 +61,7 @@ CPython定义了PY_VERSION字符串，格式是MAJOR.MINOR.PATCH，我们再次�
 
 动态调试将redirect.nxs dump出来，加上文件头，使用uncompyle6反编译  
 
-不出意外的失败了，因为做了混淆  
-
-暂且不处理混淆，至此可以大胆猜测，NeoX做了pyc混淆，开启游戏时首先加载redirect.pyc模块，此模块做了一些事情，很可能是解密文件得到pyc，然后再加载其他pyc    
+不出意外的失败了，因为做了混淆，暂且不处理  
 
 #### 找加载文件流程
 暂时不管redirect.nxs，继续顺藤摸瓜分析处理redirect.nxs的函数  
