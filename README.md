@@ -1,3 +1,20 @@
+# NeoXResearch
+  
+网易NeoX引擎npk格式研究
+
+## 前人工作
+[neox-tools](https://github.com/xforce/neox-tools)  
+[NeteaseUnpackTools](https://github.com/yuanbi/NeteaseUnpackTools)  
+[unnpk](https://github.com/YJBeetle/unnpk)  
+[pymarshal.py](https://gist.github.com/fate0/3e1d23bce9d4d2cfa93848dd92aba3d4)
+  
+## 关键点
+网上已有一些前人工作可供参考，但更新大多停留在几年前（2017~2019年）左右，已经失效了，不能直接拿来用  
+主要有以下变化：
+* 之前so会导出CPython一些函数，现在不再导出
+* 之前pyc混淆只调换了opcode的定义，现在增加了新opcode
+* 部分函数从纯python实现改成了native注册给python实现
+
 #### 确认是否是neox引擎
 解包看是否有大量NeoX相关
 
@@ -29,7 +46,4 @@ CPython定义了PY_VERSION字符串，格式是MAJOR.MINOR.PATCH，我们再次�
 NeoX从C++注册了一些模块，大部分不重要，部分重要的，查Python注册模块函数，能搜到模块函数表
 
 参考  
-[neox-tools](https://github.com/xforce/neox-tools)  
-[NeteaseUnpackTools](https://github.com/yuanbi/NeteaseUnpackTools)  
-[unnpk](https://github.com/YJBeetle/unnpk)
-[pymarshal.py](https://gist.github.com/fate0/3e1d23bce9d4d2cfa93848dd92aba3d4)
+
