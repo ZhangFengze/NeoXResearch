@@ -106,7 +106,7 @@ FileLoader读出文件后，如果this+44字节处存储了neox::game::NXEncodeH
 参考链接里的npk解包没有处理这一步解密，导致解出的文件无法识别  
 
 #### npk文件格式
-结合这两个函数可以得到npk的格式如下  
+由NpkReader可以得到npk的格式如下  
 
 [0:4] magic head 必须为 'NXPK'  
 [4:8] 包含文件数量（int型全按小端序）   
@@ -120,7 +120,7 @@ FileLoader读出文件后，如果this+44字节处存储了neox::game::NXEncodeH
 [8:12] 文件数据大小  
 [12:16] 文件数据解压后大小  
 [24:26] 压缩方式 （0：未压缩 1：zlib 2：lz4，一般为2）    
-[26:27] 加密方式（0：未加密 1：rc4 2：simple）  
+[26:27] 加密方式（0：未加密 1：rc4 2：simple，一般为0）  
 
 #### 修复pyc
 由前人工作，可知NeoX修改了CPython的opcode定义。可以看反汇编代码，也可以对比魔改的Python产生的pyc与原版，得到映射关系。  
