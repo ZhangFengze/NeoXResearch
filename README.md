@@ -94,7 +94,7 @@ NxNpk::Load调用NpkReader::Load
 
 NpkReader真正处理npk格式，前人工作中猜测的npk格式也在此处得到印证  
 
-NpkReader::Open读取npk，获得基础信息，构建索引表  
+NpkReader::Open读取npk，获得基础信息，构建元信息表  
 
 NpkReader::Load使用所需加载文件的元信息，从npk文件中解出目标文件  
 
