@@ -505,7 +505,6 @@ class _Marshaller:
 
                 opcode[c+1] = new_to_skip % (1 << 8)
                 opcode[c+2] = new_to_skip >> 8
-                pass
 
             # define JUMP_IF_FALSE_OR_POP 111 /* Target byte offset from beginning of code */
             # define JUMP_IF_TRUE_OR_POP 112	/* "" */
