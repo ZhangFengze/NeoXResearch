@@ -123,7 +123,28 @@ FileLoader读出文件后，如果this+44字节处存储了neox::game::NXEncodeH
 [26:27] 加密方式（0：未加密 1：rc4 2：simple，一般为0）  
 
 #### 修复pyc
-由前人工作，可知NeoX修改了CPython的opcode定义。可以看反汇编代码，也可以对比魔改的Python产生的pyc与原版，得到映射关系。  
+由前人工作，可知NeoX修改了CPython的opcode定义  
+
+按参考链接给出的方式，编译出调用so的NeoXPython，对比原版Python与NeoXPython生成的pyc，得到opcode映射关系  
+
+由于不再导出Python函数，所以需要自己找Py_Initialize等函数地址，而不是直接dlsym  
+
+额外注意下函数地址，如果运行时总是报illegal instruction，可能是函数地址不对  
+
+arm cpu有两种模式，普通和thumb两种，跳转地址最后一位为0表示普通，1表示thumb mode，如果错了就会报illegal instruction  
+
+dlsym会自动处理这个，手动算地址的话需要额外修一下函数地址  
+
+拿到opcode映射关系后，着手修复，发现还是有未知opcode  
+
+还是用笨方法，从Python处理opcode的函数看未知opcode的作用，分析其原本含义  
+
+具体函数是PyEval_EvalFrameEx  
+
+新opcode基本都是旧opcode的组合，需要将新opcode替换成多个旧opcode  
+
+需要注意的是一个opcode变成多个opcode，改变了地址，需要修复带跳转地址指令的参数，以及地址与行数对应关系表  
+
 我试图找到其他更简洁的方法，于是翻CPython源码，发现有个opcode模块可以直接打印opcode表。但是NeoX是Embed Python，opcode是py module，没有内置此模块。    
 也没有想到其他的好办法，最后还是用对比pyc的方法拿到了opcode映射表。  
 
