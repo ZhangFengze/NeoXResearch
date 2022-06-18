@@ -118,6 +118,7 @@ FileLoader读出文件后，如果this+44字节处存储了neox::game::NXEncodeH
 [12:16] 文件数据解压后大小  
 [24:26] 压缩方式 （0：未压缩 1：zlib 2：lz4，一般为2）    
 [26:27] 加密方式（0：未加密 1：rc4 2：simple，一般为0）  
+注意lz4采用block压缩方式  
 
 #### 修复pyc
 由前人工作，可知NeoX修改了CPython的opcode定义  
