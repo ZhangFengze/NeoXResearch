@@ -2,22 +2,28 @@
   
 网易NeoX引擎npk格式研究
 
-## 前人工作
+## 参考
 [neox-tools](https://github.com/xforce/neox-tools)  
 [NeteaseUnpackTools](https://github.com/yuanbi/NeteaseUnpackTools)  
 [unnpk](https://github.com/YJBeetle/unnpk)  
-[pymarshal.py](https://gist.github.com/fate0/3e1d23bce9d4d2cfa93848dd92aba3d4)
+[pymarshal.py](https://gist.github.com/fate0/3e1d23bce9d4d2cfa93848dd92aba3d4)  
+fate0的博客 *阴阳师：一个非酋的逆向旅程*  (自行搜索)
   
-## 关键点
+## 逆向思路
 网上已有一些前人工作可供参考，但更新大多停留在几年前（2017~2019年）左右，已经失效了，不能直接拿来用  
 
 主要有以下变化：
 * 之前so会导出一些CPython函数，现在不再导出
 * 之前pyc混淆只调换了opcode的定义，现在增加了新opcode
 * 部分函数从纯python实现改成了native注册给python实现
-  
+
+这里仅介绍关键部分 与 基础流程需要修改的部分  
+
+基础流程见参考链接  
+
 #### 找出CPython关键函数
 NeoX内置了CPython，并魔改了一部分源码，我们需要找到关键函数比如Py_Initialize以便分析  
+
 ##### 确认CPython版本
 首先确认NeoX使用的CPython版本，以便参考源码  
 
@@ -46,7 +52,62 @@ CPython定义了PY_VERSION字符串，格式是MAJOR.MINOR.PATCH，我们再次�
 
 这里推荐多找一些CPython函数，这样之后分析NeoX的native代码时更方便些
 
-#### 获得opcode映射表
+#### 找加载脚本流程
+由前人工作可知，redirect.nxs负责解密脚本  
+
+尝试直接搜索redirect字符串，可以找到硬编码处理redirect.nxs的函数  
+
+由于之前已经分析好了CPython函数，可以看出该函数读取了redirect.nxs文件，调用PyMarshal_ReadObjectFromString得到PyObject，再调用PyImport_ExecCodeModule，执行并引入了redirect模块   
+
+所以redirect.nxs是一个序列化好了的python module，翻python源码可知这相当于去掉了文件头的pyc文件  
+
+动态调试将redirect.nxs dump出来，加上文件头，使用uncompyle6反编译  
+
+不出意外的失败了，因为做了混淆  
+
+暂且不处理混淆，至此可以大胆猜测，NeoX做了pyc混淆，开启游戏时首先加载redirect.pyc模块，此模块做了一些事情，很可能是解密文件得到pyc，然后再加载其他pyc    
+
+#### 找加载文件流程
+暂时不管redirect.nxs，继续顺藤摸瓜分析处理redirect.nxs的函数  
+
+redirect.nxs的文件内容是从IScriptFileSystem的成员函数调用得到的  
+
+IScriptFileSystem是通过字符串找出来的，继续搜字符串，找到注册IScriptFileSystem的地方，确认IScriptFileSystem的实际类型是neox::game::FileSystem
+
+找到neox::game::FileSystem的vtable，其第一个成员函数为读取文件，假设叫ReadFile  
+
+一路分析，可知neox::game::FileSystem::ReadFile调用neox::filesystem::NXFileSystem::Open
+
+neox::filesystem::NXFileSystem::Open遍历neox::filesystem::NXFileLoader，采用第一个成功的FileLoader读出的结果  
+
+找neox::filesystem::NXFileLoader的构造，可知是由多种FileLoaderCreator构造的，例如neox::filesystem::NXNpkLoaderCreator::NewLoader  
+
+而所有FileLoaderCreator统一在neox::filesystem::NXFileLoaderCreatorManager::NXFileLoaderCreatorManager中注册自己  
+
+通过名字猜测NXDiscreteFileLoaderCreator对应散文件，优先读取，NXNpkLoaderCreator对应npk  
+
+通过动态调试确认上述猜测，应该是采用了常见手游文件管理方式，游戏发更新时直接将散文件存在文件系统，优先读取，没找到散文件则去资源包读取  
+
+NXDiscreteFileLoader::Open直接调用neox::io::input的成员函数，将数据读进buffer  
+
+neox::io::InputCFile应该是neox::io::input的主要实现，读取函数直接转发到fread  
+
+neox::filesystem::NXNpkLoader::Open遍历了NxPackage，neox::filesystem::NXNpkLoader::NewPackage创建Package，可知实际类型为NxNpk  
+
+NxNpk::Load又转发给NpkReader::Load  
+
+
+
+
+
+
+
+
+
+
+
+
+#### 修复pyc
 由前人工作，可知NeoX修改了CPython的opcode定义。可以看反汇编代码，也可以对比魔改的Python产生的pyc与原版，得到映射关系。  
 我试图找到其他更简洁的方法，于是翻CPython源码，发现有个opcode模块可以直接打印opcode表。但是NeoX是Embed Python，opcode是py module，没有内置此模块。    
 也没有想到其他的好办法，最后还是用对比pyc的方法拿到了opcode映射表。  
