@@ -103,25 +103,19 @@ NpkReader::Load使用所需加载文件的元信息，从npk文件中解出目�
 #### npk文件格式
 结合这两个函数可以得到npk的格式如下  
 
-[0:4] must be 'NXPK'  
-[4:8] file count  
-[8:20] unknown  
-[20:24] offset of meta table  
-[24:meta table] data  
-[meta table:meta table+28] meta table entry[0]  
-[meta table+28:meta table+56] meta table entry[1]  
-...  
-[meta table+28\*(file count-1):meta table+28\*file count] meta table entry[file count-1]  
-end of file  
+[0:4] magic head 必须为 'NXPK'  
+[4:8] 包含文件数量（int型全按小端序）   
+[20:24] 元信息表 相对文件头的偏移   
+中间是裸数据  
+之后是元信息表，然后文件结束  
 
-meta table的每个条目占28字节，具体含义如下  
-[0:4] file id (4 bytes hash)
-[4:8] data offset  
-[8:12] compressed size (in npk size)  
-[12:16] uncompressed size (real file size)  
-[24:26] compress type (0:uncompressed 1:lz4 2:zlib)  
-[26:27] encrypt type (0:unencrypted 1:rc4 2:simple)  
-
+元信息表的每一项有28字节，共有文件数量项，每项格式如下  
+[0:4] 文件ID（文件路径的哈希）
+[4:8] 文件数据 相对文件头的偏移
+[8:12] 文件数据大小  
+[12:16] 文件数据解压后大小  
+[24:26] 压缩方式 （0：未压缩 1：zlib 2：lz4，一般为2）    
+[26:27] 加密方式（0：未加密 1：rc4 2：simple）  
 
 #### 修复pyc
 由前人工作，可知NeoX修改了CPython的opcode定义。可以看反汇编代码，也可以对比魔改的Python产生的pyc与原版，得到映射关系。  
